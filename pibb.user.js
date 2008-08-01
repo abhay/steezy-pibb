@@ -72,7 +72,7 @@ var ChatRoom = function(client, browser) {
       msg += self.add_twitter_img_tags(msg)
       msg = self.add_emoticons(msg)
       msg += self.add_sad_trombone(msg)
-      msg += self.add_youtube_embeds(msg)
+      msg += self.add_video_embeds(msg)
       
       var from_current_user = self.get_aliases().some(function(a){ return message.author.toLowerCase() == a.toLowerCase() })
 
@@ -172,19 +172,24 @@ var ChatRoom = function(client, browser) {
             .replace(/DERP\!/, '<img src="http://img.skitch.com/20080801-ehk4xc8n65xdx2sndc4scckyf2.jpg" alt="DERP!"/>')
 		  return emoticonned
 		},		
-		add_youtube_embeds: function(message){
-		  var the_match = message.match(/http:\/\/(www.|)youtube\.com\/watch\?v=([^&]+)/);
-		  if (the_match) {
+		
+		add_video_embeds: function(message){
+		  var youtube_re = /http:\/\/(www.|)youtube\.com\/watch\?v=([^&]+)/;
+		  var vimeo_re = /http:\/\/(www.|)vimeo\.com\/([^&]+)/;
+		  
+		  if (match = message.match(youtube_re)) {
 		    embed  = '<br />'
-		    embed += '<object width="425" height="344">'
-		    embed += '<param name="movie" value="http://www.youtube.com/v/' + the_match[2] + '&hl=pt-br&fs=1">'
-		    embed += '</param><param name="allowFullScreen" value="true"></param>'
-		    embed += '<embed src="http://www.youtube.com/v/' + the_match[2] + '&hl=pt-br&fs=1" type="application/x-shockwave-flash" allowfullscreen="true" width="425" height="344"></embed>'
-		    embed += '</object>'
-			  return embed
-	    } else {
-	      return ''
-	    }
+		    embed += '<object width="425" height="344"><param name="movie" value="http://www.youtube.com/v/' + match[2] + '&hl=pt-br&fs=1"></param><param name="allowFullScreen" value="true"></param><embed src="http://www.youtube.com/v/' + match[2] + '&hl=pt-br&fs=1" type="application/x-shockwave-flash" allowfullscreen="true" width="425" height="344"></embed></object>'
+		    return embed
+		  } else {
+		    if (match = message.match(vimeo_re)) {
+		      embed  = '<br />'
+		      embed += '<object width="506" height="278"><param name="allowfullscreen" value="true" /><param name="movie" value="http://www.vimeo.com/moogaloop.swf?clip_id=' + match[2] + '&amp;server=www.vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" /><embed src="http://www.vimeo.com/moogaloop.swf?clip_id=' + match[2] + '&amp;server=www.vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" type="application/x-shockwave-flash" allowfullscreen="true" width="506" height="278"></embed></object>'
+		      return embed
+		    } else {
+		      return ''
+		    }
+		  }
 		},		
 		
 		setup_message_window_events: function(){
