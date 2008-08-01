@@ -194,12 +194,12 @@ var ChatRoom = function(client, browser) {
 		  var the_match = message.match(/https?:\/\/gist\.github\.com\/\w{1,}/);
 		  if (the_match) {
 		    embed = "<br />"
-		    embed += '<iframe width="100%" border="0" src="' + the_match[0] + '.txt" />'
+		    embed += '<iframe width="100%" frameborder="0" src="' + the_match[0] + '.txt" />'
 		    return embed
 		  } else {
 		    return ''
 		  }
-		},		
+		},
 		
 		setup_message_window_events: function(){
 			if (self.client.message_window()) self.client.message_window().addEventListener('click', self.message_window_clicked, true)
