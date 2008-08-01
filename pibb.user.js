@@ -40,6 +40,9 @@ var ChatRoom = function(client, browser) {
 			add_css_rule('.steezy-tag',  	'-webkit-border-radius:5px;', self.client.doc())
 			add_css_rule('.steezy-tag',  	'padding:2px;', self.client.doc())			
 			add_css_rule('.steezy-tag',  	'-webkit-box-shadow:0 0 5px rgba(0, 0, 0, 0.5);', self.client.doc())	
+			
+			add_css_rule('.by-current-user', 'background:' + self.my_bg_color + ';', self.client.doc())
+			add_css_rule('.important-message', 'background:' + self.important_bg_color + ';', self.client.doc())								
 		},
 		
 		new_messages : [],
@@ -73,6 +76,7 @@ var ChatRoom = function(client, browser) {
       msg = self.add_emoticons(msg)
       msg += self.add_sad_trombone(msg)
       msg += self.add_video_embeds(msg)
+      msg += self.add_gists(msg)
       
       var from_current_user = self.get_aliases().some(function(a){ return message.author.toLowerCase() == a.toLowerCase() })
 
@@ -81,13 +85,13 @@ var ChatRoom = function(client, browser) {
 				self.mark_all_read()
 				message.mark_read(self.client.new_class)
 				message.by_current_user = true
-				message.elem.style['background'] = self.my_bg_color				
+				message.elem.className = message.elem.className + ' by-current-user'		
 			}
 			
 			// if message has one of the words from the alias input in it
 			if (!from_current_user && self.get_aliases().some(function(a){ return (a.length > 0) && (message.body.match(new RegExp('\\b(' + a + ')\\b','i'))) })) {
 				self.browser.alert(message.author + " said", message.body, message.icon)
-				message.elem.style['background'] = self.important_bg_color
+				message.elem.className = message.elem.className + ' important-message'
         msg += self.add_haha(msg)
 			}
 			
@@ -180,15 +184,20 @@ var ChatRoom = function(client, browser) {
 		  if (match = message.match(youtube_re)) {
 		    embed  = '<br />'
 		    embed += '<object width="425" height="344"><param name="movie" value="http://www.youtube.com/v/' + match[2] + '&hl=pt-br&fs=1"></param><param name="allowFullScreen" value="true"></param><embed src="http://www.youtube.com/v/' + match[2] + '&hl=pt-br&fs=1" type="application/x-shockwave-flash" allowfullscreen="true" width="425" height="344"></embed></object>'
+			  return embed
+	    } else {
+	      return ''
+	    }
+		},
+		
+		add_gists: function(message) {
+		  var the_match = message.match(/https?:\/\/gist\.github\.com\/\w{1,}/);
+		  if (the_match) {
+		    embed = "<br />"
+		    embed += '<iframe width="100%" border="0" src="' + the_match[0] + '.txt" />'
 		    return embed
 		  } else {
-		    if (match = message.match(vimeo_re)) {
-		      embed  = '<br />'
-		      embed += '<object width="506" height="278"><param name="allowfullscreen" value="true" /><param name="movie" value="http://www.vimeo.com/moogaloop.swf?clip_id=' + match[2] + '&amp;server=www.vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" /><embed src="http://www.vimeo.com/moogaloop.swf?clip_id=' + match[2] + '&amp;server=www.vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" type="application/x-shockwave-flash" allowfullscreen="true" width="506" height="278"></embed></object>'
-		      return embed
-		    } else {
-		      return ''
-		    }
+		    return ''
 		  }
 		},		
 		
@@ -210,7 +219,7 @@ var ChatRoom = function(client, browser) {
 			if (!self.client.doc().getElementById('steezy-input')){
 				self.aliases_input = document.createElement("input")
 				self.aliases_input.id = "steezy-input"
-				self.aliases_input['class'] = "steezy-input"			
+				self.aliases_input.className = "steezy-input"			
 
 				self.client.footer().appendChild(self.aliases_input)
 				self.aliases_input.value = self.aliases_input_cookie.get_value()				
