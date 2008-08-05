@@ -202,7 +202,7 @@ var ChatRoom = function(client, browser) {
 		},		
 		
 		add_video_embeds: function(message){
-		  var youtube_re = /http:\/\/(www.|)youtube\.com\/watch\?v=([^&]+)/;
+		  var youtube_re = /http:\/\/([^\.]+\.|)youtube\.com\/watch\?v=([^&]+)/;
 		  var vimeo_re = /http:\/\/(www.|)vimeo\.com\/([^&]+)/;
 		  
 		  if (match = message.match(youtube_re)) {
