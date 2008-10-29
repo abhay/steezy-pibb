@@ -214,15 +214,14 @@ var ChatRoom = function(client, browser) {
             .replace(/^\*?ba+r+f+s*\*?/, '<img src="http://img.skitch.com/20080808-t8shmyktk66i65rx425jgrrwae.jpg" alt="Achewood - October 3, 2006"/>')
 		  return emoticonned
 		},		
-		add_youtube_embeds: function(message){
-		  var the_match = message.match(/http:\/\/(www.|)youtube\.com\/watch\?v=([^&]+)/);
-		  if (the_match) {
+		
+		add_video_embeds: function(message){
+		  var youtube_re = /http:\/\/([^\.]+\.|)youtube\.com\/watch\?v=([^&]+)/;
+		  var vimeo_re = /http:\/\/(www.|)vimeo\.com\/([^&]+)/;
+		  
+		  if (match = message.match(youtube_re)) {
 		    embed  = '<br />'
-		    embed += '<object width="425" height="344">'
-		    embed += '<param name="movie" value="http://www.youtube.com/v/' + the_match[2] + '&hl=pt-br&fs=1">'
-		    embed += '</param><param name="allowFullScreen" value="true"></param>'
-		    embed += '<embed src="http://www.youtube.com/v/' + the_match[2] + '&hl=pt-br&fs=1" type="application/x-shockwave-flash" allowfullscreen="true" width="425" height="344"></embed>'
-		    embed += '</object>'
+		    embed += '<object width="425" height="344"><param name="movie" value="http://www.youtube.com/v/' + match[2] + '&hl=pt-br&fs=1"></param><param name="allowFullScreen" value="true"></param><embed src="http://www.youtube.com/v/' + match[2] + '&hl=pt-br&fs=1" type="application/x-shockwave-flash" allowfullscreen="true" width="425" height="344"></embed></object>'
 			  return embed
 	    } else {
 	      return ''
