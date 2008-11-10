@@ -1,0 +1,27 @@
+convert all the self.xxx bullshit to just using vars (especially for private instance methods)
+
+move css stuff to client class
+
+use setInterval?
+
+Keep a running list of all links posted and who posted them in the DOM
+
+don't mark all read on auto-replies
+
+Preferences form
+- colors for messages
+  
+- give the message class a reference to the client class that it belongs to
+
+MAYBE
+
+- Make an Element wrapper class for add_class and remove_class kinda things?
+
+- Somehow the script makes highlighting message-internals impossible in fluid...
+
+Hawt-keys
+- tab switching
+- mark all as read
+- focus input bar
+  
+- handle tab switching (detect if tab is switched and do the right thing)

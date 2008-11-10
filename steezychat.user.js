@@ -8,6 +8,8 @@
 // @include       *campfirenow.com*
 // ==/UserScript==
 
+(function(){
+
 ///////////////////////////////////////////////////////////////////////////////
 // Utility Functions
 
@@ -102,8 +104,10 @@ var ChatRoom = function(client, browser) {
       	msg += self.add_twitter_img_tags(msg)
 			if (self.emoticons_checkbox.checked)
       	msg =  self.add_emoticons(msg)
-      if (self.videos_checkbox.checked)
+      if (self.videos_checkbox.checked) {
 				msg += self.add_youtube_embeds(msg)
+				msg += self.add_vimeo_embeds(msg)
+			}
 			msg += self.add_sad_trombone(msg)
       msg += self.add_gists(msg)
 
@@ -158,14 +162,14 @@ var ChatRoom = function(client, browser) {
 		},
 		
 		add_img_tags: function(message){
-			var the_match = message.match(/(http:\/\/[^<>]+\.(jpg|png|gif))/i)
+			var the_match = message.match(/(http:\/\/[^<>]+\.(jpg|png|gif|jpeg))/i)
 			if (the_match)
 			  return '<br /><img src="'+ the_match[0] + '" />'
 		  else
 		    return ''
 		},
 		add_twitter_img_tags: function(message){
-			var the_match = message.match(/http:\/\/twitter\.com\/[^<>/]+\/statuses\/([0-9]+)/)
+			var the_match = message.match(/http:\/\/twitter\.com\/[^<>\/]+\/statuses\/([0-9]+)/)
 			if (the_match && the_match.length > 1)
 			  return '<br /><img src="http://twictur.es/i/' + the_match[1] + '.gif" />'
 		  else
@@ -191,9 +195,9 @@ var ChatRoom = function(client, browser) {
 		  if (the_match) {
 		    var embed = ' '
 		    embed += '<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,28,0" width="400" height="373">'
-        embed += '<param name="movie" value="http://crossgrain.com/haha/haha.swf" />'
+        embed += '<param name="movie" value="http://crossgrain.info/haha/haha.swf" />'
         embed += '<param name="quality" value="high" />'
-        embed += '<embed src="http://crossgrain.com/haha/haha.swf" quality="high" pluginspage="http://www.adobe.com/shockwave/download/download.cgi?P1_Prod_Version=ShockwaveFlash" type="application/x-shockwave-flash" width="400" height="373"></embed>'
+        embed += '<embed src="http://crossgrain.info/haha/haha.swf" quality="high" pluginspage="http://www.adobe.com/shockwave/download/download.cgi?P1_Prod_Version=ShockwaveFlash" type="application/x-shockwave-flash" width="400" height="373"></embed>'
         embed += '</object>'
         return embed
 		  } else {
@@ -204,14 +208,16 @@ var ChatRoom = function(client, browser) {
 		  var base = '<img src="http://l.yimg.com/us.yimg.com/i/mesg/emoticons7/'
 		  var end = '" />'
 		  var emoticonned = message
-		    .replace(/:-?\)/, base + '1.gif' + end)
-		    .replace(/:-?\(/, base + '2.gif' + end)
-		    .replace(/:-?D/, base + '4.gif' + end)
-		    .replace(/8-?\)/, base + '16.gif' + end)
+  		  .replace(/:'-?\(/g, base + '20.gif' + end)
+		    .replace(/:-?\)/g, base + '1.gif' + end)
+		    .replace(/:-?\(/g, base + '2.gif' + end)
+		    .replace(/:-?D/g, base + '4.gif' + end)
+		    .replace(/8-?\)/g, base + '16.gif' + end)
 		    .replace(/\*facepalm\*/, '<img src="http://img.skitch.com/20081020-kqf6ar41tdrwiqp2k6ejhr3q3t.jpg" alt="facepalm">')
 		    .replace(/8=+(>|D)/, '<img src="http://img.skitch.com/20080801-f2k6r13iaw7xsrya39ftamugaa.png" />')
-            .replace(/(DERP[!1]+)/, '<img src="http://img.skitch.com/20080801-ehk4xc8n65xdx2sndc4scckyf2.jpg" alt="$1"/>')
-            .replace(/^\*?ba+r+f+s*\*?/, '<img src="http://img.skitch.com/20080808-t8shmyktk66i65rx425jgrrwae.jpg" alt="Achewood - October 3, 2006"/>')
+        .replace(/(DERP[!1]+)/, '<img src="http://img.skitch.com/20080801-ehk4xc8n65xdx2sndc4scckyf2.jpg" alt="$1"/>')
+        .replace(/^\*?ba+r+f+s*\*?/, '<img src="http://img.skitch.com/20080808-t8shmyktk66i65rx425jgrrwae.jpg" alt="Achewood - October 3, 2006"/>')
+        .replace(/do not want|dnw/i, '<img src="http://img.skitch.com/20081031-1tt6dpsq42p85i2472xmc3yped.jpg" />')
 		  return emoticonned
 		},		
 		
@@ -226,6 +232,24 @@ var ChatRoom = function(client, browser) {
 	    } else {
 	      return ''
 	    }
+		},
+		
+		add_vimeo_embeds: function(message) {
+		  var the_match = message.match(/vimeo.com\/\d{1,}/)
+		  if (the_match) {
+		    var id = the_match.toString().split('/')[1]
+		    embed = '<br />'
+		    embed += '<object width="501" height="334">'
+		    embed += '<param name="allowfullscreen" value="true" />'
+		    embed += '<param name="allowscriptaccess" value="always" />'
+		    embed += '<param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id=' + id
+		    embed += '&amp;server=vimeo.com&amp;show_title=0&amp;show_byline=0&amp;show_portrait=0&amp;color=a60011&amp;fullscreen=1" />'
+		    embed += '<embed src="http://vimeo.com/moogaloop.swf?clip_id=' + id
+		    embed += '&amp;server=vimeo.com&amp;show_title=0&amp;show_byline=0&amp;show_portrait=0&amp;color=a60011&amp;fullscreen=1" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" width="501" height="334"></embed></object>'
+		    return embed
+	    } else {
+	      return ''
+		  }
 		},
 		
 		add_gists: function(message) {
@@ -573,4 +597,6 @@ var Other = function(){
 		window.chat_room = new ChatRoom(new Pibb(), new browser())
 	if (document.title.match('Campfire'))
 		window.chat_room = new ChatRoom(new SteezyCampfire(), new browser())
+})()
+
 })()
