@@ -162,9 +162,11 @@ var ChatRoom = function(client, browser) {
 		},
 		
 		add_img_tags: function(message){
-			var the_match = message.match(/(http:\/\/[^<>]+\.(jpg|png|gif|jpeg))/i)
+			var the_match = message.match(/(http:\/\/[^<>]+\.(jpg|png|gif|jpeg))/gi)
 			if (the_match)
-			  return '<br /><img src="'+ the_match[0] + '" />'
+			  return the_match.map(function(tm,i){
+					return i % 2 === 0 ? '<br /><img src="'+ tm + '" />' : ''
+				}).join('')
 		  else
 		    return ''
 		},
@@ -213,11 +215,14 @@ var ChatRoom = function(client, browser) {
 		    .replace(/:-?\(/g, base + '2.gif' + end)
 		    .replace(/:-?D/g, base + '4.gif' + end)
 		    .replace(/8-?\)/g, base + '16.gif' + end)
-		    .replace(/\*facepalm\*/, '<img src="http://img.skitch.com/20081020-kqf6ar41tdrwiqp2k6ejhr3q3t.jpg" alt="facepalm">')
-		    .replace(/8=+(>|D)/, '<img src="http://img.skitch.com/20080801-f2k6r13iaw7xsrya39ftamugaa.png" />')
-        .replace(/(DERP[!1]+)/, '<img src="http://img.skitch.com/20080801-ehk4xc8n65xdx2sndc4scckyf2.jpg" alt="$1"/>')
-        .replace(/^\*?ba+r+f+s*\*?/, '<img src="http://img.skitch.com/20080808-t8shmyktk66i65rx425jgrrwae.jpg" alt="Achewood - October 3, 2006"/>')
-        .replace(/do not want|dnw/i, '<img src="http://img.skitch.com/20081031-1tt6dpsq42p85i2472xmc3yped.jpg" />')
+		    .replace(/\*facepalm\*/g, '<img src="http://img.skitch.com/20081020-kqf6ar41tdrwiqp2k6ejhr3q3t.jpg" alt="facepalm">')
+		    .replace(/tmyk/ig, '<img src="http://img.skitch.com/20081202-mfnhnh9nursmcs2fb8smj6w94q.jpg" alt="tmyk">')
+		    .replace(/the more you know/gi, '<img src="http://img.skitch.com/20081202-nr24rt47pu6d26y3qnmu994cha.jpg" alt="the more you know">')
+		    .replace(/8=+(>|D)/g, '<img src="http://img.skitch.com/20080801-f2k6r13iaw7xsrya39ftamugaa.png" />')
+        .replace(/(DERP[!1]+)/g, '<img src="http://img.skitch.com/20080801-ehk4xc8n65xdx2sndc4scckyf2.jpg" alt="$1"/>')
+        .replace(/^\*?ba+r+f+s*\*?/g, '<img src="http://img.skitch.com/20080808-t8shmyktk66i65rx425jgrrwae.jpg" alt="Achewood - October 3, 2006"/>')
+        .replace(/do not want|dnw/gi, '<img src="http://img.skitch.com/20081031-1tt6dpsq42p85i2472xmc3yped.jpg" />')
+        .replace(/odb/gi, '<img src="http://img.skitch.com/20081211-gwjfs9q8gcqjdq3sn6w13bd4at.jpg" alt="oh baby I like it raw"/>')
 		  return emoticonned
 		},		
 		
@@ -264,11 +269,18 @@ var ChatRoom = function(client, browser) {
 		},
 		
 		setup_message_window_events: function(){
-			if (self.client.message_window()) self.client.message_window().addEventListener('click', self.message_window_clicked, true)
+			if (self.client.message_window()){
+				self.client.message_window().addEventListener('mousedown', self.message_window_mousedown, true)
+				self.client.message_window().addEventListener('mouseup', self.message_window_clicked, true)
+			} 
 			window.setTimeout(self.setup_message_window_events, self.period)
 		},
-		message_window_clicked : function(){
-			self.client.message_input().focus()
+		message_window_mousedown : function(e){
+			self.last_mousedown_x = e.clientX
+		},
+		message_window_clicked : function(e){
+			if (e.clientX == self.last_mousedown_x)
+				self.client.message_input().focus()
 			self.mark_all_read()
 		}, 
 		mark_all_read : function() {
@@ -334,8 +346,10 @@ var ChatRoom = function(client, browser) {
 		},
 		
 		get_aliases: function(){
-			if (self.aliases_input)
+			if (self.aliases_input && self.aliases_input.value.length > 0)
 				return self.aliases_input.value.split(',')
+			else
+				return []
 		}
 	};
 
@@ -517,7 +531,8 @@ var SteezyCampfire = function(){
 			var tmp = []
 			
 			for ( var last = self.message_window().lastChild; last; last = last.previousSibling ){			
-				if ((last.nodeType != 1) || (!last.id) || (!last.className) || (!last.className.match('text_message')))
+				if ((last.nodeType != 1) || (!last.id) || (!last.className) || (!last.className.match('text_message')) 
+				  || last.className.match('you'))
 					continue					
 				
 				if (last.className.match(self.read_class))
@@ -554,7 +569,7 @@ var Fluid = function(){
 		alert : function(title, description, icon, sticky) {
 			window.fluid.showGrowlNotification({
 		    title				: title,
-		    description	: description, 
+		    description	: description.replace(/<.*?>/g,''), 
 		    priority		: 1,
 		    sticky			: sticky,
 				icon				: icon
